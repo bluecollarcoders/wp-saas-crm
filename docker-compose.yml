@@ -15,6 +15,9 @@ services:
       - ./wp-data:/var/www/html
     networks:
       - crm_network
+    depends_on:
+      - db
+    entrypoint: ["/bin/sh", "-c", "docker-entrypoint.sh; curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && apache2-foreground"]
 
   db:
     image: mysql:8.0
