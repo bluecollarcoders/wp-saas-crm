@@ -11,13 +11,18 @@ services:
       WORDPRESS_DB_USER: ${MYSQL_USER}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_SMTP_HOST: mailhog
+      WORDPRESS_SMTP_PORT: 1025
+      XDEBUG_MODE: debug
+      XDEBUG_CONFIG: "client_host=host.docker.internal start_with_request=yes"
     volumes:
       - ./wp-data:/var/www/html
     networks:
       - crm_network
     depends_on:
       - db
-    entrypoint: ["/bin/sh", "-c", "docker-entrypoint.sh; curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && apache2-foreground"]
+      - mailhog
+    entrypoint: ["/bin/sh", "-c", "docker-entrypoint.sh; apt-get update && apt-get install -y php-xdebug curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp && apache2-foreground"]
 
   db:
     image: mysql:8.0
@@ -42,6 +47,16 @@ services:
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - crm_network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: wp-saas-crm-mailhog
+    restart: always
+    ports:
+      - "8025:8025"  # Web interface
+      - "1025:1025"  # SMTP server
     networks:
       - crm_network
 
