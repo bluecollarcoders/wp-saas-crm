@@ -1,0 +1,15 @@
+# Ignore WordPress Core & uploads
+wp-data/
+wp-content/uploads/
+
+# Ignore database files
+db_data/
+
+# Ignore system files
+.DS_Store
+.env
+
+# Ignore Docker containers
+*.log
+docker-compose.override.yml
+

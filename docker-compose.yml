@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  wp:
+    image: wordpress:latest
+    container_name: wp-saas-crm
+    ports:
+      - "8085:80"  # Unique port to avoid conflicts
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: wp_saas_crm
+    volumes:
+      - ./wp-data:/var/www/html
+    networks:
+      - crm_network
+
+  db:
+    image: mysql:8.0
+    container_name: wp-saas-crm-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: wp_saas_crm
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - crm_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: wp-saas-crm-phpmyadmin
+    restart: always
+    ports:
+      - "8086:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpass
+    networks:
+      - crm_network
+
+networks:
+  crm_network:
+    driver: bridge
+
+volumes:
+  db_data:
+
